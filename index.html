@@ -4,6 +4,8 @@
 	<head>
 		<!-- meta -->
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<title>Blank Project</title>
 
 		<!-- fonts -->
@@ -18,27 +20,41 @@
 	<body>
 		<div class="container-fluid">
 			<div class="row">
-				<div class="col-md-offset-2 col-md-8 superhead">
+				<div class="col-md-offset-3 col-md-6 superhead">
 					Meta Data
 				</div>
 			</div>
 			<div class="row">
-				<div class="col-md-offset-2 col-md-8 headline">
+				<div class="col-md-offset-3 col-md-6 headline">
 					How long must a current world record remain unbroken to become the longest standing record?
 				</div>
 			</div>
 			<div class="row">
-				<div class="col-md-offset-2 col-md-8 byline">
+				<div class="col-md-offset-3 col-md-6 byline">
 					By Harry Stevens
 				</div>
 			</div>
 			<div class="row">
-				<div class="col-md-offset-2 col-md-8 dateline">
+				<div class="col-md-offset-3 col-md-6 dateline">
 					August 23rd, 2016
 				</div>
 			</div>
+			<div class="row copy">
+				<div class="col-md-offset-3 col-md-6">
+					<p>
+						Fifty-nine track and field athletes won gold medals during the 2016 Summer Olympics in Rio. But only three of them broke a world record.
+					</p>
+					<p>
+						The performances of Almaz Ayana (women&rsquo;s 10,000 meters), Wayde van Niekerk (men&rsquo;s 400 meters), and Anita Wlodarczyk (women&rsquo;s hammer throw) were superior not only to those of their Olympic competitors, but to the efforts of every athlete who has ever competed in their respective sports.
+					</p>
+					<p>
+						Yet there is still another record that none of them have broken, a record that will take decades to break: the record for the longest standing record.
+					</p>
+					<hr />
+				</div>
+			</div>
 			<div class="row">
-				<div class="col-md-offset-2 col-md-8">
+				<div class="col-md-offset-1 col-md-10">
 					<div class="filter-wrapper">
 						<div class="filter-label">
 							Gender
@@ -61,32 +77,50 @@
 							<select name="events" class="filter filter-dropdown"></select>
 						</div>
 					</div>
-					<div class="legend-wrapper">
-						<div class="legend-item">
-							<div class="legend-swatch red">
-								&nbsp;
-							</div>
-							Pre-IAAF Era
+				</div>
+
+			</div>
+			<div class="row infobox-row">
+				<div class="col-md-offset-7 col-md-4 infobox-column">
+					<p class="event"></p>
+					<p class="narrative"></p>
+				</div>
+			</div>
+
+			<div class="row">
+				<svg class="chart col-md-offset-1 col-md-10"></svg>
+			</div>
+			<div class="row">
+				<div class="col-md-offset-1 col-md-10 legend">
+					<div class="legend-item">
+						KEY:
+					</div>
+					<div class="legend-item">
+						<div class="legend-swatch darkblue">
+							&nbsp;
 						</div>
-						<div class="legend-item">
-							<div class="legend-swatch blue"></div>
-							IAAF Era
-						</div>
+						Performance listed but not ratified by the International Association of Athletics Federations (IAAF)
+					</div>
+					<div class="legend-item">
+						<div class="legend-swatch blue"></div>
+						Performance ratified by the IAAF
 					</div>
 				</div>
-
-			</div>
-
-			<div class="row">
-				<svg class="chart col-md-offset-2 col-md-8"></svg>
 			</div>
 			<div class="row">
-				<div class="col-md-offset-2 col-md-8">
-					SOURCE: Progression of IAAF World Records, 2015 Edition; <a href="https://www.rio2016.com/en/schedule-and-results">Rio2016.com</a>
+				<div class="col-md-offset-1 col-md-10 notes"></div>
+			</div>
+			<div class="row">
+				<div class="col-md-offset-1 col-md-10 source">
+					SOURCE: Progression of IAAF World Records, 2015 Edition; <a href="https://www.iaaf.org/records/by-category/world-records">IAAF.org</a>; <a href="https://www.rio2016.com/en/schedule-and-results">Rio2016.com</a>
 				</div>
 			</div>
+
 			<div class="row">
-				<div class="col-md-offset-2 col-md-8 notes"></div>
+				<div class="col-md-offset-1 col-md-10 download">
+					<a href="/data/data.csv" download="hindustan-times_athletics-world-records-progression.csv">Download the data (CSV)</a>
+					<hr />
+				</div>
 			</div>
 		</div>
 
@@ -96,6 +130,7 @@
 		<script src="https://d3js.org/d3.v4.min.js"></script>
 		<script src="js/moment.min.js"></script>
 		<script src="js/underscore.min.js"></script>
+		<script src="js/history.js"></script>
 		<script src="js/scripts.js"></script>
 
 	</body>
