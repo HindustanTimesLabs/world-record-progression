@@ -1,16 +1,30 @@
 $(document).ready(function() {
-	
+
+	// mobile logo
+	function mobileLogo(x) {
+		if (x < 480) {
+			$('.navbar-brand img').attr('src', 'img/ht-logo-sq.png');
+		} else {
+			$('.navbar-brand img').attr('src', 'img/navlogo.png');
+		}
+	}
+
+	mobileLogo($(window).width());
+	$(window).resize(function() {
+		mobileLogo($(window).width());
+	});
+
 	// check for Browsers, to fix the dropdown appearance
 	var isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
 	var isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
-	if (isSafari||isFirefox){
-		$('.filter-dropdown').css('margin-left','0em');
+	if (isSafari || isFirefox) {
+		$('.filter-dropdown').css('margin-left', '0em');
 	}
 
 	//check for url history
 	var url = window.location.href, startGender, startEvent;
 
-	if (url.includes('?')) {
+	if (url.indexOf('?') !== -1) {
 		startGender = ((url.split('?')[1]).split('=')[1]).split('&')[0], startEvent = decodeURIComponent((url.split('?')[1]).split('=')[2]);
 	} else {
 		startGender = 'Men', startEvent = '400 m';
@@ -259,8 +273,6 @@ $(document).ready(function() {
 	// write a d3 function to deal with this data
 	function drawViz(data, width) {
 
-		console.log(data);
-
 		// determine offset of infobox
 		if (data[0].type == 'speed') {
 			$('.infobox-column').addClass('col-md-offset-7').removeClass('col-md-offset-2');
@@ -334,13 +346,21 @@ $(document).ready(function() {
 		if (recordResult.date != longestResult.date) {
 			newRecord = moment(recordResult.date).add(longestResult.duration, 'ms').format('MMMM D, YYYY');
 			narrative = 'For <b>' + name + '&rsquo;s</b> ' + newOrCurrent + ' world record of <b>' + recordResult[units] + '</b> to become the longest standing world record, it will have to go unbroken until <b>' + newRecord + '</b>. Then it will have lasted longer than <b>' + oldName + '&rsquo;s</b> record of <b>' + longestResult[units] + '</b>, which stood for <b>' + yearsBetween + ' years</b>, from <b>' + longestResult.date + '</b>, until <b>' + longestResult.nextDateString + '</b>.';
+			narrativeShare = 'For world record to become longest held, must last til ' + moment(newRecord).format('MMM. D, YYYY') + '.';
 		} else {
 			newRecord = moment().add(longestResult.duration, 'ms').format('MMMM D, YYYY');
 			narrative = '<b>' + name + '&rsquo;s</b> ' + newOrCurrent + ' world record of <b>' + recordResult[units] + '</b>, set on <b>' + recordResult.date + '</b>, is also the longest standing record. Even if someone broke it today, their new record would have to go unbroken for <b>' + yearsBetween + ' years</b>, until <b>' + newRecord + '</b>, to become the longest held record.';
+			narrativeShare = name + '\'s world record is the longest held.';
 		}
 
-		$('.narrative').html(narrative);
+		$('.narrative').html(narrative + '<a class="twitter-share" onclick="window.open(this.href,\'targetWindow\',\'toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes,width=600,height=300\');return false;"><i class="fa fa-twitter" style="margin-left: 8px;font-size: 1.3em;" aria-hidden="true"></i></a>');
 		$('.event').html(recordResult.gender + '&rsquo;s ' + recordResult.event.toLowerCase());
+
+		//share hrefs
+		var twitterShare = 'https://twitter.com/home?status=' + data[0].event + ': ' + narrativeShare + ' ' + encodeURIComponent(url);
+		$('.twitter-share').attr('href', twitterShare);
+		var facebookShare = 'https://www.facebook.com/sharer/sharer.php?u=' + url;
+		$('.facebook-share').attr('href', facebookShare);
 
 		// SET THE SCALE DOMAINS
 
@@ -393,7 +413,20 @@ $(document).ready(function() {
 		});
 
 		// set the axes
-		var yAxis = d3.axisLeft().scale(yScale).ticks(10).tickSizeInner(-width + 1).tickSizeOuter(0).tickPadding(8);
+		function tickResponsive(width) {
+			var obj = {};
+			if (width < 992) {
+				obj.width = 0;
+				obj.height = 0;
+			} else {
+				obj.width = -width + 1;
+				obj.height = -height + 90;
+
+			}
+			return obj;
+		}
+
+		var yAxis = d3.axisLeft().scale(yScale).ticks(10).tickSizeInner(tickResponsive($(window).width()).width).tickSizeOuter(0).tickPadding(8);
 
 		var yAxisGroup = chart.append('g').attr('class', 'axis y-axis').call(yAxis);
 
@@ -405,30 +438,49 @@ $(document).ready(function() {
 			}
 		}
 
-		var xAxis = d3.axisBottom().scale(xScale).ticks(xTickCount($(window).width())).tickSizeInner(-height + 90).tickSizeOuter(0).tickPadding(8);
+		var xAxis = d3.axisBottom().scale(xScale).ticks(xTickCount($(window).width())).tickSizeInner(tickResponsive($(window).width()).height).tickSizeOuter(0).tickPadding(8);
 
 		var xAxisGroup = chart.append("g").attr('class', 'axis x-axis').attr("transform", "translate(0," + (height - padding * 3) + ")").call(xAxis);
 
 		// set the y-axis tick string
+
 		$('.y-axis g text').each(function() {
 			if (data[0].type == 'speed') {
-				$(this).html(timeAxis($(this).html()));
+				var thisHTML = $(this).text();
+				if (thisHTML != undefined) {
+					$(this).text(timeAxis(thisHTML));
+				}
 			}
 		});
 
 		// axis labels
-		yAxisGroup.append('text').attr("text-anchor", 'top').attr('class', 'axis-label').attr("transform", "translate(" + 20 + "," + height / 3.5 + ")rotate(-90)").text(axisLabels(data[0].type, data[0][score]));
-
-		function xLabel(window, chart) {
-			if (window < 992) {
-				return chart - 60;
+		function yAxisPos(x) {
+			if (x > 992) {
+				return height / 3.5;
 			} else {
-				return chart;
+				return height / 6;
 			}
 		}
 
 
-		xAxisGroup.append('text').attr('text-anchor', 'end').attr('class', 'axis-label').attr("transform", "translate(" + xLabel($(window).width(), width) + "," + -5 + ")").text('Date');
+		yAxisGroup.append('text').attr("text-anchor", 'top').attr('class', 'axis-label').attr("transform", "translate(" + 20 + "," + yAxisPos($(window).width()) + ")rotate(-90)").text(axisLabels(data[0].type, data[0][score]));
+
+		function xLabel(window, chart) {
+			var obj = {};
+			if (window < 992) {
+				obj.translate = chart / 2.3;
+				obj.textAnchor = 'middle';
+				obj.transform = 40;
+			} else {
+				obj.translate = chart;
+				obj.textAnchor = 'end';
+				obj.transform = -5;
+			}
+			return obj;
+		}
+
+
+		xAxisGroup.append('text').attr('text-anchor', xLabel($(window).width(), width).textAnchor).attr('class', 'axis-label').attr("transform", "translate(" + xLabel($(window).width(), width).translate + "," + xLabel($(window).width(), width).transform + ")").text('Date');
 
 		// now define the bars' text
 		bar.append("text").attr('class', 'bar-text').attr("x", function(d, i) {
@@ -438,6 +490,14 @@ $(document).ready(function() {
 					if ($(window).width() <= 992) {
 						if (d.event == '3000 m steeplechase') {
 							return -113;
+						} else if (d.event == '400 m hurdles') {
+							return -20;
+						} else if (d.event == '5000 m') {
+							return -30;
+						} else if (d.event == 'Marathon') {
+							return -40;
+						} else if (d.event == '100 m hurdles') {
+							return -20;
 						}
 					}
 				}
@@ -450,15 +510,21 @@ $(document).ready(function() {
 						}
 					} else {
 						if (d.event == '100 m hurdles') {
-							return -104;
+							return -123;
 						} else if (d.event == '10000 m') {
-							return -135;
+							return -150;
 						} else if (d.event == '1500 m') {
-							return -130;
+							return -143;
 						} else if (d.event == '4 x 100 m relay') {
 							return -106;
 						} else if (d.event == '5000 m') {
 							return -170;
+						} else if (d.event == '20 km walk') {
+							return -50;
+						} else if (d.event == 'Hammer throw') {
+							return -20;
+						} else if (d.event == 'Pole vault') {
+							return -40;
 						}
 
 					}
@@ -516,39 +582,39 @@ $(document).ready(function() {
 						}
 					} else {
 						if (d.event == 'Triple jump') {
-							return -72;
+							return -88;
 						} else if (d.event == 'Shot put') {
-							return -156;
+							return -178;
 						} else if (d.event == 'Pole vault') {
 							return -100;
 						} else if (d.event == 'Marathon') {
-							return -209;
+							return -220;
 						} else if (d.event == 'Long jump') {
-							return -152;
+							return -174;
 						} else if (d.event == 'Javelin throw') {
-							return -160;
+							return -182;
 						} else if (d.event == 'High jump') {
-							return -149;
+							return -172;
 						} else if (d.event == 'Heptathlon') {
-							return -160;
+							return -180;
 						} else if (d.event == 'Hammer throw') {
 							return -125;
 						} else if (d.event == 'Discus throw') {
 							return -159;
 						} else if (d.event == '800 m') {
-							return -157;
+							return -178;
 						} else if (d.event == '5000 m') {
 							return -124;
 						} else if (d.event == '400 m hurdles') {
-							return -199;
+							return -204;
 						} else if (d.event == '4 x 400 m relay') {
-							return -170;
+							return -176;
 						} else if (d.event == '4 x 100 m relay') {
 							return -117;
 						} else if (d.event == '3000 m steeplechase') {
 							return -223;
 						} else if (d.event == '200 m') {
-							return -160;
+							return -165;
 						} else if (d.event == '20 km walk') {
 							return -135;
 						} else if (d.event == '1500 m') {
@@ -558,9 +624,9 @@ $(document).ready(function() {
 						} else if (d.event == '100 m hurdles') {
 							return -127;
 						} else if (d.event == '100 m') {
-							return -159;
+							return -170;
 						} else if (d.event == '400 m') {
-							return -46;
+							return -68;
 						} else {
 							return -90;
 						}
@@ -568,6 +634,15 @@ $(document).ready(function() {
 				}
 			} else if (d.gender == 'Men') {
 
+				if (i == 0) {
+					if ($(window).width() > 992) {
+
+					} else {
+						if (d.event == '5000 m') {
+							return -50;
+						}
+					}
+				}
 				if (d.duration == longest) {
 					if ($(window).width() > 992) {
 						if (d.event == 'Pole vault') {
@@ -575,17 +650,21 @@ $(document).ready(function() {
 						}
 					} else {
 						if (d.event == 'Pole vault') {
-							return -125;
+							return -142;
 						} else if (d.event == '4 x 100 m relay') {
 							return -65;
 						} else if (d.event == '4 x 400 m relay') {
-							return -105;
+							return -140;
 						} else if (d.event == 'Long jump') {
 							return -65;
 						} else if (d.event == 'Marathon') {
-							return -105;
+							return -120;
 						} else if (d.event == '50 km walk') {
 							return -65;
+						} else if (d.event == '800 m') {
+							return -20;
+						} else if (d.event == 'Decathlon') {
+							return -40;
 						}
 					}
 				}
@@ -645,37 +724,37 @@ $(document).ready(function() {
 						}
 					} else {
 						if (d.event == 'Shot put') {
-							return -183;
+							return -196;
 						} else if (d.event == 'High jump') {
-							return -183;
-						} else if (d.event == 'Triple jump') {
 							return -193;
+						} else if (d.event == 'Triple jump') {
+							return -203;
 						} else if (d.event == 'Pole vault') {
 							return -113;
 						} else if (d.event == 'Marathon') {
 							return -132;
 						} else if (d.event == 'Long jump') {
-							return -73;
+							return -85;
 						} else if (d.event == 'Javelin throw') {
-							return -195;
+							return -205;
 						} else if (d.event == 'Hammer throw') {
-							return -177;
+							return -190;
 						} else if (d.event == 'Discus throw') {
-							return -176;
+							return -190;
 						} else if (d.event == 'Decathlon') {
 							return -118;
 						} else if (d.event == '50 km walk') {
 							return -133;
 						} else if (d.event == '400 m hurdles') {
-							return -188;
+							return -200;
 						} else if (d.event == '4 x 400 m relay') {
-							return -95;
+							return -105;
 						} else if (d.event == '4 x 100 m relay') {
 							return -120;
 						} else if (d.event == '3000 m steeplechase') {
-							return -220;
+							return -225;
 						} else if (d.event == '1500 m') {
-							return -210;
+							return -215;
 						} else if (d.event == '110 m hurdles') {
 							return -120;
 						} else if (d.event == '5000 m') {
@@ -683,17 +762,17 @@ $(document).ready(function() {
 						} else if (d.event == '10000 m') {
 							return -124;
 						} else if (d.event == '400 m') {
-							return -126;
+							return -131;
 						} else if (d.event == '20 km walk') {
 							return -135;
 						} else if (d.event == '800 m') {
-							return -130;
+							return -135;
 						} else if (d.event == '100 m') {
-							return -107;
+							return -112;
 						} else if (d.event == '20 km walk') {
-							return -123
+							return -128;
 						} else {
-							return -113;
+							return -118;
 						}
 					}
 				}
@@ -747,9 +826,9 @@ $(document).ready(function() {
 
 		if (x < 992) {
 			return x - 10;
-		} else if (x>=992&&x<1200){
+		} else if (x >= 992 && x < 1200) {
 			return x * .78;
-		}else {
+		} else {
 			return x * .79;
 		}
 
@@ -767,8 +846,10 @@ $(document).ready(function() {
 	function chartHeight(x) {
 		if (x > 992) {
 			return 600;
-		} else {
+		} else if (x <= 992 & x > 480) {
 			return 350;
+		} else {
+			return 300;
 		}
 	}
 
@@ -806,8 +887,14 @@ $(document).ready(function() {
 		drawViz(parseData(eventFilter), width);
 		setNotes(genderSelect, startEvent);
 
+		// set women to active if necessary
+		if (startGender == 'Women') {
+			$('.filter-toggle').removeClass('active').addClass('inactive');
+			$('.filter-women').removeClass('inactive').addClass('active');
+		}
+
 		//set history
-		History.pushState(null, null, "?gender=" + genderSelect + "&event=" + startEvent);
+		History.pushState(null, 'Who holds the world record for the longest world record? | Hindustan Times', "?gender=" + genderSelect + "&event=" + startEvent);
 
 		// set dropdown values based on gender selection
 		$('.filter-toggle').click(function() {
@@ -846,7 +933,7 @@ $(document).ready(function() {
 			setNotes(genderSelect, currVal);
 
 			//set history
-			History.pushState(null, null, "?gender=" + genderSelect + "&event=" + currVal);
+			History.pushState(null, 'Who holds the world record for the longest world record? | Hindustan Times', "?gender=" + genderSelect + "&event=" + currVal);
 		});
 
 		// select an event
@@ -863,7 +950,7 @@ $(document).ready(function() {
 			drawViz(parseData(eventFilter), width);
 			setNotes(genderSelect, eventSelect);
 			//set history
-			History.pushState(null, null, "?gender=" + genderSelect + "&event=" + eventSelect);
+			History.pushState(null, 'Who holds the world record for the longest world record? | Hindustan Times', "?gender=" + genderSelect + "&event=" + eventSelect);
 		});
 
 	});

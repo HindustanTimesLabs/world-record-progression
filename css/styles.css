@@ -4,12 +4,19 @@ body {
 	background-color: #fcfcfc;
 	font-family: "Lato", sans-serif;
 	overflow-x: hidden;
+	margin-top: 50px;
 }
 hr {
 	width: 60%;
 	border-top-color: #ccc;
 	margin-top: 30px;
 	margin-bottom: 10px;
+}
+a {
+	color: #2990b9;
+}
+a:hover {
+	color: #2c3e50;
 }
 
 /*Colors*/
@@ -21,6 +28,37 @@ hr {
 }
 .blue {
 	background: #2990b9;
+}
+
+/*NAVBAR*/
+.navbar {
+	height: 40px;
+	min-height: 40px;
+	border-radius: 0px;
+	border: 0px;
+}
+.navbar-brand {
+	height: 40px;
+	padding-top: 10px;
+	z-index: 1000
+}
+.navbar-title {
+	display: none;
+}
+.navbar-share {
+	padding-top: 5px;
+	float: right;
+	font-size: 20px;
+}
+.navbar-share a {
+	color: #9d9d9d;
+	text-decoration: none;
+}
+.navbar-share a:hover {
+	color: #fff;
+}
+.navbar-share i {
+	margin-left: 15px;
 }
 
 /*Headline*/
@@ -52,6 +90,9 @@ hr {
 	font-size: 1.2em;
 	margin-bottom: 20px;
 	font-weight: 300;
+}
+.copy p a {
+	font-weight: 900;
 }
 .copy hr {
 	width: 100%;
@@ -124,13 +165,12 @@ hr {
 	width: 30px;
 	float: left;
 	height: 8px;
-	margin-top: 5px;
+	margin-top: 6px;
 	margin-right: 5px;
 }
 .legend-item {
 	float: left;
 	margin-right: 15px;
-	font-size: 1em;
 }
 
 /*Chart*/
@@ -164,7 +204,7 @@ hr {
 
 /*Source, Notes & Download*/
 .source, .notes, .download, .legend {
-	font-size: .8em;
+	font-size: .9em;
 	color: #999;
 }
 .source, .notes, .download {
@@ -175,41 +215,103 @@ hr {
 	padding-bottom: 20px;
 }
 
+/*RELATED*/
+.related-stories {
+	border-top: 2px solid black;
+	width: 66.67%;
+	margin: 0 auto;
+	margin-top: 30px;
+	padding-top: 20px;
+	margin-bottom: 50px;
+}
+.related-story {
+	margin-bottom: 20px;
+	font-size: 16px;
+}
+.related-image {
+	margin-bottom: 10px;
+}
+.related-image img {
+	width: 100%;
+}
+.related-stories-title {
+	font-size: 20px;
+	margin-bottom: 10px;
+}
+
+/*FOOTER*/
+.navbar-foot li a {
+	font-size: 12px;
+}
+
 /* Large Devices, Wide Screens */
 @media only screen and (max-width: 1200px) {
 }
 
 /* Medium Devices, Desktops */
 @media only screen and (max-width: 992px) {
+	hr {
+		width: 100%;
+	}
 	.filter-wrapper:nth-of-type(2) {
 		margin-bottom: 20px;
 	}
 	.infobox-row {
 		position: static;
 		margin-top: 0px;
+		margin-bottom: -10px;
+	}
+	.infobox-column {
+		padding-top: 5px;
+		padding-bottom: 5px;
+	}
+	.navbar-foot li a {
+		font-size: 9px;
 	}
 }
 
 /* Small Devices, Tablets */
 @media only screen and (max-width: 768px) {
-	.infobox-row {
-		position: static;
-		margin-top: 0px;
+	.navbar-share {
+		margin-top: -40px;
+	}
+	.navbar-foot-title {
+		padding-left: 10px;
+	}
+	.navbar-foot li a {
+		display: none;
 	}
 }
 
 /* Extra Small Devices, Phones */
 @media only screen and (max-width: 480px) {
-	.infobox-row {
-		position: static;
-		margin-top: 0px;
+	.infobox-column p.narrative {
+		font-size: .8em;
+	}
+	.filter-wrapper {
+		width: 100%;
+	}
+	.filter-toggle-bar {
+		margin-right: 28%;
+		margin-left: 0%;
+	}
+	.filter-dropdown {
+		width: 100%;
+	}
+	.navbar-brand img {
+		width: 25px;
+	}
+	.related-stories {
+		width: 92%;
+	}
+	.navbar-foot-title {
+		padding-left: 10px;
+	}
+	.navbar-foot li a {
+		display: none;
 	}
 }
 
 /* Custom, iPhone Retina */
 @media only screen and (max-width: 320px) {
-	.infobox-row {
-		position: static;
-		margin-top: 0px;
-	}
 }
