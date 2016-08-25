@@ -25,7 +25,13 @@ $(document).ready(function() {
 	var url = window.location.href, startGender, startEvent;
 
 	if (url.indexOf('?') !== -1) {
-		startGender = ((url.split('?')[1]).split('=')[1]).split('&')[0], startEvent = decodeURIComponent((url.split('?')[1]).split('=')[2]);
+
+		//facebook share is making things weird...
+		if (url.indexOf('+') !== -1) {
+			startGender = 'Men', startEvent = '400 m';
+		} else {
+			startGender = ((url.split('?')[1]).split('=')[1]).split('&')[0], startEvent = decodeURIComponent((url.split('?')[1]).split('=')[2]);
+		}
 	} else {
 		startGender = 'Men', startEvent = '400 m';
 	}
